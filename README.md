@@ -71,6 +71,18 @@ Estimate of time needed to complete: 15min
 
 Start time: 2:27pm PST
 
+Finish time: 3:07pm PST
+
+Actual time needed to complete: 40min
+
+-----------------------------------------------------
+
+Name of feature: Best Book List
+
+Estimate of time needed to complete: 2.5h
+
+Start time: 3:09pm PST
+
 Finish time: ---
 
 Actual time needed to complete: --- -->
