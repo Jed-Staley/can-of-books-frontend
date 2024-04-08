@@ -73,4 +73,4 @@ Start time: 2:27pm PST
 
 Finish time: ---
 
-Actual time needed to complete: ---
+Actual time needed to complete: --- -->
