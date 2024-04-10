@@ -13,8 +13,6 @@ function AddBook(props) {
     props.handleAddBook(bookData);
   }
 
-  const handleDelete = async (event) => props.handleDelete(event.target.id);
-
   return (
     <Modal show={props.show} onHide={props.handleClose}>
       <Modal.Header closeButton>
@@ -41,7 +39,7 @@ function AddBook(props) {
             <div key={book._id}>
               <h2>{book.title}</h2>
               <p>Color: {book.availability}</p>
-              <button id={book._id} onClick={() => handleDelete(book._id)}>Delete Me</button>
+              <button id={book._id} onClick={() => props.handleDeleteBook(book._id)}>Delete Me</button>
             </div>
           ))}
         </section>
