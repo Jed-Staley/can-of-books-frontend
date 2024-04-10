@@ -1,86 +1,93 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Button } from 'react-bootstrap';
 import Carousel from 'react-bootstrap/Carousel';
-
 import AddBook from './AddBook';
 
-class BestBooks extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      books: [],
-      loading: true,
-      error: null,
-      showAddBookModal: false
-    };
-  }
+const BestBooks = () => {
+  const [books, setBooks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [showAddBookModal, setShowAddBookModal] = useState(false);
 
-  componentDidMount() {
-    this.fetchBooks();
-  }
+  useEffect(() => {
+    fetchBooks();
+  }, []);
 
-  fetchBooks = async () => {
+  const fetchBooks = async () => {
     try {
-      console.log('Contacting', `${import.meta.env.VITE_BACKEND_URL}/books`);
+      console.log(`${import.meta.env.VITE_BACKEND_URL}/books`);
       const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/books`);
-      this.setState({
-        books: response.data,
-        loading: false,
-        error: null
-      });
+      setBooks(response.data);
+      setLoading(false);
+      setError(null);
     } catch (error) {
-      this.setState({
-        loading: false,
-        error: 'Failed to fetch books.'
-      });
+      setLoading(false);
+      setError('Failed to fetch books.');
       console.error('Error fetching books:', error);
     }
   };
 
-  toggleAddBookModal = () => {
-    this.setState(prevState => ({
-      showAddBookModal: !prevState.showAddBookModal
-    }));
+  const addBook = async (newBook) => {
+    // try {
+      console.log(`${import.meta.env.VITE_BACKEND_URL}/books`, newBook);
+      let response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/books`, newBook);
+      console.log(response);  
+      console.log(response.data);
+      setBooks([...books, response.data]);
+    // } catch (error) {
+    //   console.error(error);
+    // }
   };
 
-  render() {
-    const { books, loading, error, showAddBookModal } = this.state;
+  const deleteBook = async (id) => {
+    try {
+      console.log(`${import.meta.env.VITE_BACKEND_URL}/books/${id}`);
+      await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/books/${id}`);
+      setBooks(books.filter((book) => book._id !== id));
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-    return (
-      <>
-        <h2>My Essential Lifelong Learning & Formation Shelf</h2>
+  const toggleAddBookModal = () => {
+    setShowAddBookModal((prev) => !prev);
+  };
 
-        <Button onClick={this.toggleAddBookModal}>Add Book</Button>
+  return (
+    <>
+      <h2>My Essential Lifelong Learning & Formation Shelf</h2>
 
-        {loading ? (
-          <p>Loading...</p>
-        ) : error ? (
-          <h3>{error}</h3>
-        ) : books.length ? (
-          <Carousel>
-            {books.map(book => (
-              <Carousel.Item key={book._id}>
-                <div className="book">
-                  <h3>{book.title}</h3>
-                  <p>{book.description}</p>
-                  <p>Status: {book.status}</p>
-                </div>
-              </Carousel.Item>
-            ))}
-          </Carousel>
-        ) : (
-          <h3>No Books Found :(</h3>
-        )}
-        <AddBook
-          show={showAddBookModal}
-          handleClose={this.toggleAddBookModal}
-          handleAddBook={this.handleAddBook}
-          books={books}
-        />
-      </>
-    );
-  }
-}
+      <Button onClick={toggleAddBookModal}>Add Book</Button>
+
+      {loading ? (
+        <p>Loading...</p>
+      ) : error ? (
+        <h3>{error}</h3>
+      ) : books.length ? (
+        <Carousel>
+          {books.map((book) => (
+            <Carousel.Item key={book._id}>
+              <div className="book">
+                <h3>{book.title}</h3>
+                <p>{book.description}</p>
+                <p>Availability: {book.availability}</p>
+              </div>
+            </Carousel.Item>
+          ))}
+        </Carousel>
+      ) : (
+        <h3>No Books Found :(</h3>
+      )}
+      <AddBook
+        show={showAddBookModal}
+        handleClose={toggleAddBookModal}
+        handleAddBook={addBook}
+        handleDeleteBook={deleteBook}
+        books={books}
+      />
+    </>
+  );
+};
 
 export default BestBooks;
