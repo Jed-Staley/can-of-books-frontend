@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Modal, Button, Form } from 'react-bootstrap';
 import axios from 'axios';
+import { Modal, Button, Form } from 'react-bootstrap';
 
-function AddBook(props) {
+function AddBook({ show, close, updateBooks }) {
   const [bookData, setBookData] = useState({ title: '', description: '', availability: '' });
 
   const handleChange = event => setBookData({ ...bookData, [event.target.name]: event.target.value});
@@ -10,11 +10,22 @@ function AddBook(props) {
   const handleSubmit = (event) => {
     event.preventDefault();
     console.log(bookData);
-    props.handleAddBook(bookData);
+    addBook(bookData);
   }
 
+  const addBook = async (newBook) => {
+    try {
+      console.log('Adding book through', `${import.meta.env.VITE_BACKEND_URL}/books`, newBook);
+      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/books`, newBook);
+      updateBooks();
+      close();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
-    <Modal show={props.show} onHide={props.handleClose}>
+    <Modal show={show} onHide={close}>
       <Modal.Header closeButton>
         <Modal.Title>Books</Modal.Title>
       </Modal.Header>
@@ -34,15 +45,6 @@ function AddBook(props) {
           </Form.Group>
           <Button type="submit">Add Book</Button>
         </Form>
-        <section>
-          {props.books.map((book) => (
-            <div key={book._id}>
-              <h2>{book.title}</h2>
-              <p>Color: {book.availability}</p>
-              <button id={book._id} onClick={() => props.handleDeleteBook(book._id)}>Delete Me</button>
-            </div>
-          ))}
-        </section>
       </Modal.Body>
     </Modal>
   );
